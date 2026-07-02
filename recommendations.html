@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ============================================================
+     META
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recommendations | NutriSense AI</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f7fa;
+    color: #333;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2E8B57;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    color: #2E8B57;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+/* ============================================================
+   SUMMARY CARDS (top row)
+   ============================================================ */
+.summary-card {
+    border: none;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    background: white;
+    padding: 20px;
+}
+
+.summary-card h3 {
+    color: #2E8B57;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.summary-card .value {
+    font-size: 30px;
+    font-weight: bold;
+    color: #222;
+}
+
+/* ============================================================
+   NUTRITION SCORE CIRCLE
+   ============================================================ */
+.score-circle {
+    width: 140px;
+    height: 140px;
+    margin: 10px auto 15px;
+    border-radius: 50%;
+    background: #2E8B57;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 38px;
+    font-weight: bold;
+}
+
+/* ============================================================
+   PROGRESS BARS
+   ============================================================ */
+.progress {
+    height: 18px;
+    border-radius: 20px;
+}
+
+.progress-green  { background: #2E8B57; }
+.progress-blue   { background: #4CAF50; }
+.progress-orange { background: #FF9800; }
+.progress-pink   { background: #E91E63; }
+
+/* ============================================================
+   FOOD / INFO CARDS
+   ============================================================ */
+.food-card {
+    background: #f8fff9;
+    border-radius: 12px;
+    border-left: 5px solid #2E8B57;
+    height: 100%;
+}
+
+.food-card h4 {
+    color: #2E8B57;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.food-card p {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 0;
+}
+
+/* ============================================================
+   AI ANALYSIS BOX
+   ============================================================ */
+.ai-box {
+    background: #f8fff9;
+    border-left: 5px solid #2E8B57;
+    border-radius: 10px;
+    padding: 15px 18px;
+    line-height: 1.9;
+}
+
+.ai-box p {
+    margin-bottom: 4px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar navbar-light bg-white">
+<div class="container d-flex justify-content-between align-items-center">
+    <span class="logo">🥗 NutriSense AI</span>
+    <div class="d-flex align-items-center gap-2">
+        <a href="meal_logger.html"    class="btn btn-sm btn-outline-success">🍽️ Meal Logger</a>
+        <a href="weekly_reports.html" class="btn btn-sm btn-outline-success">📊 Weekly Report</a>
+        <span id="welcomeUser" class="text-muted" style="font-size:14px;">Welcome</span>
+    </div>
+</div>
+</nav>
+
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<div class="container my-4">
+
+
+    <!-- --------------------------------------------------------
+         PERSONALIZED DAILY SUMMARY
+         Loaded from Flask /get-profile + /analyze
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>👋 Personalized Daily Summary</h2>
+        <p><strong>Name:</strong>               <span id="userName">-</span></p>
+        <p><strong>Goal:</strong>               <span id="userGoal">-</span></p>
+        <p><strong>Daily Target:</strong>        1800 kcal</p>
+        <p><strong>Today's Intake:</strong>      <span id="todayCalories">0</span> kcal</p>
+        <p><strong>Remaining Calories:</strong>  <span id="remainingCalories">1800</span> kcal</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         SUMMARY CARDS
+         Loaded from Flask /dashboard (today's totals)
+         -------------------------------------------------------- -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>🔥 Calories</h3>
+                <div class="value" id="caloriesCard">0</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>💪 Protein</h3>
+                <div class="value" id="proteinCard">0g</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>🍞 Carbs</h3>
+                <div class="value" id="carbsCard">0g</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>💧 Water</h3>
+                <div class="value" id="waterCard">0</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         NUTRITION SCORE
+         Calculated from today's calories, protein, water
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4 text-center">
+        <h2>🏆 Nutrition Score</h2>
+        <div class="score-circle" id="nutritionScore">0</div>
+        <p class="text-muted">Based on calorie balance, protein intake, hydration and meal consistency.</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         AI NUTRITION ANALYSIS
+         Loaded from Flask /analyze — real warnings + suggestions
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🤖 AI Nutrition Analysis</h2>
+        <div class="ai-box" id="aiAnalysis">
+            Loading analysis...
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         RECOMMENDED FOODS
+         Based on user's health goal from profile
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🍎 Recommended Foods</h2>
+        <div class="row g-3" id="recommendedFoods">
+            <div class="col-12 text-muted">Loading...</div>
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         FOODS TO LIMIT
+         General healthy eating guidance
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🚫 Foods To Limit</h2>
+        <div class="row g-3">
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="food-card p-3">
+                    <h4>🍟 French Fries</h4>
+                    <p>High in calories and unhealthy fats.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="food-card p-3">
+                    <h4>🥤 Sugary Drinks</h4>
+                    <p>Contribute excess sugar intake.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="food-card p-3">
+                    <h4>🍔 Fast Food Burgers</h4>
+                    <p>Often high in sodium and fat.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="food-card p-3">
+                    <h4>🍕 Excessive Pizza</h4>
+                    <p>Can quickly exceed calorie goals.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         MACRONUTRIENT BREAKDOWN
+         Calculated from Flask /dashboard data
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>📊 Macronutrient Breakdown</h2>
+
+        <div class="mt-3">
+
+            <div class="d-flex justify-content-between">
+                <h4>Protein</h4>
+                <span id="proteinPercent">0%</span>
+            </div>
+            <div class="progress mb-3">
+                <div class="progress-bar progress-blue" id="proteinBar"
+                     role="progressbar" style="width:0%"></div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <h4>Carbohydrates</h4>
+                <span id="carbPercent">0%</span>
+            </div>
+            <div class="progress mb-3">
+                <div class="progress-bar progress-orange" id="carbBar"
+                     role="progressbar" style="width:0%"></div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <h4>Fat</h4>
+                <span id="fatPercent">0%</span>
+            </div>
+            <div class="progress mb-3">
+                <div class="progress-bar progress-pink" id="fatBar"
+                     role="progressbar" style="width:0%"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         HYDRATION RECOMMENDATION
+         From localStorage waterGlasses count
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>💧 Hydration Recommendation</h2>
+        <p>Current Water Intake: <strong id="currentWater">0</strong> / 8 Glasses</p>
+        <p class="mt-2" id="hydrationAdvice">Drink at least 8 glasses daily for optimal hydration.</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         GOAL PROGRESS
+         Today's calories vs 1800 kcal goal
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🎯 Goal Progress Status</h2>
+        <p>Target Calories:   <strong>1800</strong> kcal</p>
+        <p>Consumed Calories: <strong id="consumedCalories">0</strong> kcal</p>
+        <div class="progress mt-3">
+            <div class="progress-bar progress-green" id="goalProgressBar"
+                 role="progressbar" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-muted" id="goalProgressText">0% Complete</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         POTENTIAL NUTRIENT DEFICIENCIES
+         Based on today's protein, water, meal count
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>⚠️ Potential Nutrient Deficiencies</h2>
+        <div class="row g-3" id="nutrientWarnings">
+            <div class="col-12 text-muted">Analyzing...</div>
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         SUGGESTED MEAL PLAN
+         Based on user's health goal
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🍽️ Suggested Meal Plan</h2>
+        <div class="row g-3" id="mealPlan">
+            <div class="col-12 text-muted">Loading meal plan...</div>
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         HEALTH TIP OF THE DAY
+         Random tip, changes each visit
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>💡 Health Tip of the Day</h2>
+        <div class="ai-box">
+            <p id="healthTip">Loading tip...</p>
+        </div>
+    </div>
+
+
+</div><!-- /container -->
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+
+// Base URL for all Flask API calls
+const API_URL = "http://127.0.0.1:5000";
+
+// Water glasses — simple preference stored in localStorage
+const water = parseInt(localStorage.getItem("waterGlasses") || "0");
+
+// Health tips — random one shown each visit
+const HEALTH_TIPS = [
+    "Eat protein with every meal to stay fuller for longer.",
+    "Drink water before meals to improve hydration.",
+    "Choose whole foods over processed foods whenever possible.",
+    "Add vegetables to at least two meals every day.",
+    "Aim for consistent meal timings throughout the day.",
+    "Reduce sugary drinks and replace them with water.",
+    "Include fruits as healthy snack options.",
+    "Sleep well — poor sleep increases hunger hormones.",
+    "Eating slowly helps your body recognize fullness.",
+    "A balanced plate has protein, carbs, and vegetables."
+];
+
+
+// ============================================================
+// PAGE LOAD — Run all sections when page opens
+// ============================================================
+window.onload = async function () {
+    loadHealthTip();         // Show random tip immediately
+    await loadProfile();     // Load name + goal from Flask
+    await loadDashboard();   // Load today's nutrition from Flask
+    await loadAnalysis();    // Load AI warnings from Flask
+};
+
+
+// ============================================================
+// LOAD PROFILE
+// ============================================================
+// Gets user name and goal from Flask /get-profile.
+// If session expired, redirects to login.
+// ============================================================
+async function loadProfile() {
+    try {
+        const res  = await fetch(API_URL + "/get-profile", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok) {
+            // Build display name from first + last name, fallback to username
+            const displayName = [data.first_name, data.last_name]
+                .filter(Boolean)
+                .join(" ") || data.username || "User";
+
+            document.getElementById("userName").textContent     = displayName;
+            document.getElementById("welcomeUser").textContent  = "Welcome, " + displayName;
+            document.getElementById("userGoal").textContent     = data.goal || "-";
+
+            // Save to localStorage for food recommendations
+            localStorage.setItem("profile", JSON.stringify(data));
+
+            // Generate goal-based food recommendations
+            generateFoodRecommendations(data.goal || "");
+            generateMealPlan(data.goal || "");
+
+        } else {
+            window.location.href = "index.html";
+        }
+
+    } catch (err) {
+        console.error("Profile load error:", err);
+    }
+}
+
+
+// ============================================================
+// LOAD DASHBOARD
+// ============================================================
+// Gets today's total nutrition from Flask /dashboard.
+// Updates summary cards, macros, progress bar, score.
+// ============================================================
+async function loadDashboard() {
+    try {
+        const res  = await fetch(API_URL + "/dashboard", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok) {
+            const calories = data.total_calories || 0;
+            const protein  = data.total_protein  || 0;
+            const carbs    = data.total_carbs    || 0;
+            const fat      = data.total_fat      || 0;
+            const meals    = data.meals          || [];
+
+            // Summary cards
+            document.getElementById("caloriesCard").textContent      = calories;
+            document.getElementById("proteinCard").textContent       = protein  + "g";
+            document.getElementById("carbsCard").textContent         = carbs    + "g";
+            document.getElementById("waterCard").textContent         = water    + " glasses";
+
+            // Daily summary
+            document.getElementById("todayCalories").textContent     = calories;
+            document.getElementById("remainingCalories").textContent = Math.max(1800 - calories, 0);
+            document.getElementById("consumedCalories").textContent  = calories;
+
+            // Nutrition score
+            renderNutritionScore(calories, protein, water, meals.length);
+
+            // Macronutrient breakdown bars
+            renderMacroBreakdown(protein, carbs, fat);
+
+            // Goal progress bar
+            renderGoalProgress(calories);
+
+            // Hydration advice
+            renderHydration();
+
+            // Deficiency warnings
+            renderDeficiencies(protein, water, meals.length);
+        }
+
+    } catch (err) {
+        console.error("Dashboard load error:", err);
+    }
+}
+
+
+// ============================================================
+// LOAD AI ANALYSIS
+// ============================================================
+// Gets health warnings and suggestions from Flask /analyze.
+// ============================================================
+async function loadAnalysis() {
+    try {
+        const res  = await fetch(API_URL + "/analyze", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok) {
+            // Update goal if analyze returned it
+            if (data.goal) {
+                document.getElementById("userGoal").textContent = data.goal;
+            }
+
+            // Build warnings + suggestions HTML
+            let html = "";
+            if (data.warnings)    data.warnings.forEach(w    => { html += `<p>${w}</p>`; });
+            if (data.suggestions) data.suggestions.forEach(s => { html += `<p>${s}</p>`; });
+
+            document.getElementById("aiAnalysis").innerHTML =
+                html || "<p>✅ Everything looks good today!</p>";
+        }
+
+    } catch (err) {
+        console.error("Analysis load error:", err);
+    }
+}
+
+
+// ============================================================
+// RENDER NUTRITION SCORE
+// ============================================================
+function renderNutritionScore(calories, protein, water, mealCount) {
+    let score = 0;
+    if (calories >= 1200 && calories <= 1800) score += 40;
+    if (protein  >= 60)                       score += 30;
+    if (water    >= 8)                        score += 20;
+    if (mealCount >= 3)                       score += 10;
+    document.getElementById("nutritionScore").textContent = score;
+}
+
+
+// ============================================================
+// RENDER MACRONUTRIENT BREAKDOWN BARS
+// ============================================================
+function renderMacroBreakdown(protein, carbs, fat) {
+    const total = protein + carbs + fat;
+    if (total === 0) return;
+
+    const pp = Math.round((protein / total) * 100);
+    const cp = Math.round((carbs   / total) * 100);
+    const fp = Math.round((fat     / total) * 100);
+
+    document.getElementById("proteinBar").style.width   = pp + "%";
+    document.getElementById("carbBar").style.width      = cp + "%";
+    document.getElementById("fatBar").style.width       = fp + "%";
+    document.getElementById("proteinPercent").textContent = pp + "%";
+    document.getElementById("carbPercent").textContent    = cp + "%";
+    document.getElementById("fatPercent").textContent     = fp + "%";
+}
+
+
+// ============================================================
+// RENDER GOAL PROGRESS BAR
+// ============================================================
+function renderGoalProgress(calories) {
+    const pct = Math.min((calories / 1800) * 100, 100);
+    document.getElementById("goalProgressBar").style.width  = pct + "%";
+    document.getElementById("goalProgressText").textContent = Math.round(pct) + "% Complete";
+}
+
+
+// ============================================================
+// RENDER HYDRATION ADVICE
+// ============================================================
+function renderHydration() {
+    document.getElementById("currentWater").textContent  = water;
+    document.getElementById("hydrationAdvice").textContent = water < 8
+        ? `Drink ${8 - water} more glasses today to reach your goal.`
+        : "Excellent hydration level — keep it up!";
+}
+
+
+// ============================================================
+// RENDER DEFICIENCY WARNINGS
+// ============================================================
+function renderDeficiencies(protein, water, mealCount) {
+    const warnings = [];
+    if (protein  < 60)  warnings.push({ icon: "💪", text: "Low Protein Intake",      tip: "Include chicken, eggs, or lentils." });
+    if (water    < 8)   warnings.push({ icon: "💧", text: "Low Hydration",            tip: "Drink more water throughout the day." });
+    if (mealCount < 3)  warnings.push({ icon: "🍽️", text: "Low Meal Consistency",    tip: "Try to log at least 3 meals per day." });
+
+    const el = document.getElementById("nutrientWarnings");
+
+    if (warnings.length === 0) {
+        el.innerHTML = `
+            <div class="col-12">
+                <div class="food-card p-3">
+                    <h4>✅ No Deficiencies Detected</h4>
+                    <p>Your nutrition looks balanced today!</p>
+                </div>
+            </div>`;
+        return;
+    }
+
+    el.innerHTML = warnings.map(w => `
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="food-card p-3">
+                <h4>${w.icon} ${w.text}</h4>
+                <p>${w.tip}</p>
+            </div>
+        </div>
+    `).join("");
+}
+
+
+// ============================================================
+// GENERATE FOOD RECOMMENDATIONS
+// ============================================================
+// Based on the user's health goal from their profile.
+// ============================================================
+function generateFoodRecommendations(goal) {
+    const g = goal.toLowerCase();
+
+    let foods = [];
+    if (g.includes("loss")) {
+        foods = [
+            { name: "🥗 Salad",           tip: "Low calorie, high fiber." },
+            { name: "🍎 Apple",            tip: "Natural sweetness, low cal." },
+            { name: "🍗 Grilled Chicken",  tip: "Lean protein source." },
+            { name: "🥦 Broccoli",         tip: "Nutrient dense, low carb." },
+            { name: "🥛 Low Fat Yogurt",   tip: "Protein with probiotics." }
+        ];
+    } else if (g.includes("gain")) {
+        foods = [
+            { name: "🍚 Rice",             tip: "High carb energy source." },
+            { name: "🍌 Banana",           tip: "Quick energy + potassium." },
+            { name: "🥜 Peanut Butter",    tip: "Calorie dense healthy fat." },
+            { name: "🥛 Whole Milk",       tip: "Protein + calories." },
+            { name: "🍗 Chicken Breast",   tip: "High protein muscle builder." }
+        ];
+    } else if (g.includes("muscle")) {
+        foods = [
+            { name: "🥚 Eggs",             tip: "Complete protein source." },
+            { name: "🍗 Chicken Breast",   tip: "Lean high protein." },
+            { name: "🐟 Tuna",             tip: "High protein, low fat." },
+            { name: "🥛 Milk",             tip: "Protein + calcium." },
+            { name: "🌰 Almonds",          tip: "Healthy fats + protein." }
+        ];
+    } else {
+        foods = [
+            { name: "🥗 Salad",            tip: "Vitamins and minerals." },
+            { name: "🍎 Apple",            tip: "Fiber and antioxidants." },
+            { name: "🍗 Chicken",          tip: "Lean protein source." },
+            { name: "🥛 Milk",             tip: "Calcium and protein." },
+            { name: "🍚 Brown Rice",       tip: "Complex carbohydrates." }
+        ];
+    }
+
+    document.getElementById("recommendedFoods").innerHTML = foods.map(f => `
+        <div class="col-12 col-sm-6 col-lg-2">
+            <div class="food-card p-3">
+                <h4>${f.name}</h4>
+                <p>${f.tip}</p>
+            </div>
+        </div>
+    `).join("");
+}
+
+
+// ============================================================
+// GENERATE MEAL PLAN
+// ============================================================
+// A suggested daily meal plan based on the user's goal.
+// ============================================================
+function generateMealPlan(goal) {
+    const g = goal.toLowerCase();
+
+    let plan = [];
+    if (g.includes("loss")) {
+        plan = [
+            { meal: "Breakfast", food: "🥚 Boiled Eggs + 🫐 Berries" },
+            { meal: "Lunch",     food: "🥗 Grilled Chicken Salad" },
+            { meal: "Snack",     food: "🍎 Apple + 🥜 Almonds" },
+            { meal: "Dinner",    food: "🥦 Steamed Vegetables + 🐟 Fish" }
+        ];
+    } else if (g.includes("gain")) {
+        plan = [
+            { meal: "Breakfast", food: "🍳 Eggs + 🍞 Whole Wheat Toast + 🥛 Milk" },
+            { meal: "Lunch",     food: "🍗 Chicken Breast + 🍚 Rice + 🥦 Vegetables" },
+            { meal: "Snack",     food: "🍌 Banana + 🥜 Peanut Butter" },
+            { meal: "Dinner",    food: "🥩 Beef + 🍠 Sweet Potato + 🥗 Salad" }
+        ];
+    } else if (g.includes("muscle")) {
+        plan = [
+            { meal: "Breakfast", food: "🥚 Scrambled Eggs + 🥛 Protein Shake" },
+            { meal: "Lunch",     food: "🍗 Chicken Breast + 🍚 Rice + 🥦 Broccoli" },
+            { meal: "Snack",     food: "🌰 Almonds + 🧀 Cottage Cheese" },
+            { meal: "Dinner",    food: "🐟 Tuna + 🍠 Sweet Potato + 🥗 Greens" }
+        ];
+    } else {
+        plan = [
+            { meal: "Breakfast", food: "🥚 Eggs + 🍞 Whole Wheat Bread" },
+            { meal: "Lunch",     food: "🍗 Grilled Chicken + 🥗 Salad" },
+            { meal: "Snack",     food: "🍎 Fruit + 🥜 Nuts" },
+            { meal: "Dinner",    food: "🍚 Rice + 🥦 Vegetables + 🐟 Fish" }
+        ];
+    }
+
+    document.getElementById("mealPlan").innerHTML = plan.map(item => `
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="food-card p-3">
+                <h4>${item.meal}</h4>
+                <p>${item.food}</p>
+            </div>
+        </div>
+    `).join("");
+}
+
+
+// ============================================================
+// LOAD RANDOM HEALTH TIP
+// ============================================================
+function loadHealthTip() {
+    document.getElementById("healthTip").textContent =
+        HEALTH_TIPS[Math.floor(Math.random() * HEALTH_TIPS.length)];
+}
+
+</script>
+
+<!-- WHO Health Tips Widget -->
+<script src="who_tips.js"></script>
+<script>
+    // ============================================================
+    // WHO HEALTH TIPS WIDGET
+    // ============================================================
+    // Shows a rotating floating card with WHO nutrition tips.
+    // See who_tips.js for the full implementation.
+    // ============================================================
+    initWhoTips();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ============================================================
+     META & SEO
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NutriSense AI — track meals, analyze nutrition, and get personalized AI-powered diet recommendations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥗</text></svg>">
+<title>NutriSense AI</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #f4f7fa;
+    color: #333;
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid #1b5e3a;
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   HERO SECTION
+   No navbar — just the brand mark and a clean intro.
+   ============================================================ */
+.hero {
+    min-height: 70vh;
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 60px 20px;
+}
+
+.hero .logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    opacity: 0.95;
+}
+
+.hero h1 {
+    font-size: 56px;
+    animation: fadeUp 1s;
+}
+
+.hero p {
+    font-size: 19px;
+    max-width: 650px;
+    margin: 20px auto;
+    opacity: 0.95;
+}
+
+.cta {
+    padding: 15px 35px;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    color: #2E8B57;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+
+.cta:hover {
+    background: #f0f0f0;
+}
+
+/* ============================================================
+   GENERAL SECTIONS
+   ============================================================ */
+section {
+    padding: 90px 8%;
+    scroll-margin-top: 40px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 38px;
+    color: #2E8B57;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.about {
+    text-align: center;
+    max-width: 900px;
+    margin: auto;
+    line-height: 1.9;
+    font-size: 16px;
+    color: #555;
+}
+
+/* ============================================================
+   FEATURES SECTION
+   ============================================================ */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card h3 {
+    margin: 15px 0 10px;
+    color: #2E8B57;
+    font-size: 18px;
+}
+
+.card p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   HOW IT WORKS SECTION
+   ============================================================ */
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.step {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.step h3 {
+    color: #2E8B57;
+    margin-bottom: 10px;
+}
+
+.step p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ============================================================
+   STATS SECTION
+   ============================================================ */
+.stats {
+    background: #2E8B57;
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.stat {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.stat small {
+    display: block;
+    font-size: 15px;
+    font-weight: normal;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+/* ============================================================
+   AUTH SECTION
+   ============================================================
+   This is now a SINGLE card that toggles between
+   Sign Up and Login — instead of two side-by-side forms.
+   ============================================================ */
+.forms-section {
+    background: white;
+}
+
+.auth-wrapper {
+    max-width: 450px;
+    margin: auto;
+}
+
+.form-box {
+    padding: 35px 30px;
+    border-radius: 18px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+}
+
+.form-box h3 {
+    margin-bottom: 20px;
+    color: #2E8B57;
+    font-size: 22px;
+    text-align: center;
+}
+
+/* Input fields */
+.form-box input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.form-box input:focus {
+    border-color: #2E8B57;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+/* Submit buttons */
+.btn {
+    width: 100%;
+    padding: 13px;
+    background: #2E8B57;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background: #256e46;
+}
+
+/* Success / Error messages */
+.message {
+    text-align: center;
+    margin-top: 12px;
+    min-height: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ============================================================
+   LOGIN MODE TOGGLE (Username / Email switch)
+   ============================================================ */
+.login-toggle {
+    display: flex;
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 15px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.toggle-btn.active {
+    background: #2E8B57;
+    color: white;
+}
+
+/* ============================================================
+   SWITCH LINKS
+   Small text links under each form to jump between
+   Sign Up <-> Login, and the "Forgot Password" link.
+   ============================================================ */
+.switch-text {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+    color: #666;
+}
+
+.switch-text a {
+    color: #2E8B57;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.switch-text a:hover {
+    text-decoration: underline;
+}
+
+.forgot-link {
+    text-align: right;
+    margin-top: -4px;
+    margin-bottom: 8px;
+}
+
+.forgot-link a {
+    font-size: 13px;
+    color: #2E8B57;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.forgot-link a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+    background: #111;
+    color: white;
+    text-align: center;
+    padding: 35px 20px;
+}
+
+footer h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #4CAF50;
+}
+
+footer p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .section-title {
+        font-size: 28px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HERO SECTION
+     No navbar buttons here — just the brand and description.
+     The "Get Started" button scrolls down to the auth section.
+     ============================================================ -->
+<section class="hero">
+
+    <div class="logo">🥗 NutriSense AI</div>
+
+    <h1>AI-Powered Nutrition Tracking</h1>
+
+    <p>
+        Track meals, analyze nutrition,
+        receive personalized recommendations,
+        and build a healthier lifestyle with NutriSense AI.
+    </p>
+
+    <button
+        class="cta"
+        onclick="document.getElementById('auth').scrollIntoView({ behavior: 'smooth' })">
+        Get Started Free
+    </button>
+
+</section>
+
+
+<!-- ============================================================
+     ABOUT SECTION
+     ============================================================ -->
+<section>
+
+    <h2 class="section-title">About NutriSense AI</h2>
+
+    <p class="about">
+        NutriSense AI helps you make smarter food choices through intelligent
+        meal tracking, detailed nutrition analysis, weekly health reports, and
+        AI-generated dietary recommendations. Our mission is to make healthy
+        living simple, personalized, and accessible for everyone.
+    </p>
+
+</section>
+
+
+<!-- ============================================================
+     FEATURES SECTION
+     ============================================================ -->
+<section>
+
+    <h2 class="section-title">Features</h2>
+
+    <div class="features-grid">
+
+        <div class="card">
+            <h3>🍎 Meal Logger</h3>
+            <p>Record your daily meals and track your eating habits with ease.</p>
+        </div>
+
+        <div class="card">
+            <h3>🤖 AI Insights</h3>
+            <p>Receive intelligent nutrition recommendations tailored to your goals.</p>
+        </div>
+
+        <div class="card">
+            <h3>📊 Weekly Reports</h3>
+            <p>Analyze your progress with detailed weekly health reports.</p>
+        </div>
+
+        <div class="card">
+            <h3>❤️ Healthy Lifestyle</h3>
+            <p>Build sustainable habits and improve your overall wellness.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     HOW IT WORKS SECTION
+     ============================================================ -->
+<section>
+
+    <h2 class="section-title">How It Works</h2>
+
+    <div class="steps">
+
+        <div class="step">
+            <h3>1️⃣ Create Account</h3>
+            <p>Sign up with a unique username and set up your health profile.</p>
+        </div>
+
+        <div class="step">
+            <h3>2️⃣ Log Meals</h3>
+            <p>Add your breakfast, lunch, dinner, and snacks every day.</p>
+        </div>
+
+        <div class="step">
+            <h3>3️⃣ Get AI Analysis</h3>
+            <p>Receive personalized dietary recommendations based on your data.</p>
+        </div>
+
+        <div class="step">
+            <h3>4️⃣ Improve Health</h3>
+            <p>Follow suggestions and maintain a healthier lifestyle over time.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     STATS SECTION
+     ============================================================ -->
+<section class="stats">
+
+    <div class="stats-grid">
+
+        <div class="stat">
+            10K+
+            <small>Meals Tracked</small>
+        </div>
+
+        <div class="stat">
+            5K+
+            <small>Active Users</small>
+        </div>
+
+        <div class="stat">
+            95%
+            <small>User Satisfaction</small>
+        </div>
+
+        <div class="stat">
+            24/7
+            <small>AI Support</small>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     AUTH SECTION
+     ============================================================
+     A single card that defaults to Sign Up.
+     Below the form: "Already have an account? Log in"
+     This swaps the same card into Login mode, which then
+     shows "Forgot Password?" and "New here? Create account".
+     ============================================================ -->
+<section id="auth" class="forms-section">
+
+    <h2 class="section-title">Get Started</h2>
+
+    <div class="auth-wrapper">
+
+        <!-- ------------------------------------------------
+             SIGNUP FORM
+             Shown by default when the page loads.
+             ------------------------------------------------ -->
+        <div class="form-box" id="signupBox">
+
+            <h3>Create Your Account</h3>
+
+            <form onsubmit="registerUser(); return false;">
+
+                <!-- Username — unique identifier for login -->
+                <label class="visually-hidden" for="signupUsername">Username</label>
+                <input
+                    type="text"
+                    id="signupUsername"
+                    placeholder="Username (e.g. umar_jutt589)"
+                    autocomplete="username"
+                    required>
+
+                <!-- Email address -->
+                <label class="visually-hidden" for="signupEmail">Email</label>
+                <input
+                    type="email"
+                    id="signupEmail"
+                    placeholder="Email address"
+                    autocomplete="email"
+                    required>
+
+                <!-- Password -->
+                <label class="visually-hidden" for="signupPassword">Password</label>
+                <input
+                    type="password"
+                    id="signupPassword"
+                    placeholder="Password (min. 6 characters)"
+                    autocomplete="new-password"
+                    required>
+
+                <!-- Confirm Password -->
+                <label class="visually-hidden" for="confirmPassword">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm password"
+                    autocomplete="new-password"
+                    required>
+
+                <button type="submit" class="btn">Sign Up</button>
+
+            </form>
+
+            <!-- Link to switch to Login mode -->
+            <p class="switch-text">
+                Already have an account?
+                <a onclick="showLoginForm()">Log in</a>
+            </p>
+
+            <div class="message" id="signupMsg" role="status"></div>
+
+        </div>
+
+
+        <!-- ------------------------------------------------
+             LOGIN FORM
+             Hidden by default — shown when user clicks
+             "Log in" link from the signup card above.
+             ------------------------------------------------ -->
+        <div class="form-box d-none" id="loginBox">
+
+            <h3>Welcome Back</h3>
+
+            <!-- Toggle buttons — Username or Email -->
+            <div class="login-toggle">
+                <button
+                    class="toggle-btn active"
+                    id="toggleUsername"
+                    type="button"
+                    onclick="switchLoginMode('username')">
+                    Username
+                </button>
+                <button
+                    class="toggle-btn"
+                    id="toggleEmail"
+                    type="button"
+                    onclick="switchLoginMode('email')">
+                    Email
+                </button>
+            </div>
+
+            <form onsubmit="loginUser(); return false;">
+
+                <!-- This input changes based on toggle selection -->
+                <label class="visually-hidden" for="loginInput">Username or Email</label>
+                <input
+                    type="text"
+                    id="loginInput"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required>
+
+                <label class="visually-hidden" for="loginPassword">Password</label>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required>
+
+                <!-- Forgot password link — UI only, not functional yet -->
+                <div class="forgot-link">
+                    <a onclick="forgotPassword()">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn">Login</button>
+
+            </form>
+
+            <!-- Link to switch back to Sign Up mode -->
+            <p class="switch-text">
+                New here?
+                <a onclick="showSignupForm()">Create an account</a>
+            </p>
+
+            <div class="message" id="loginMsg" role="status"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+    <h3>🥗 NutriSense AI</h3>
+    <p>Empowering healthier lifestyles through AI-powered nutrition tracking.</p>
+</footer>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+
+// Base URL for all Flask API calls
+const API_URL = "http://127.0.0.1:5000";
+
+// Tracks current login mode: "username" or "email"
+let currentLoginMode = "username";
+
+
+// ============================================================
+// FORM SWITCHING — Toggle between Sign Up and Login cards
+// ============================================================
+
+/**
+ * Hides the Sign Up card and reveals the Login card.
+ * Called when user clicks "Already have an account? Log in"
+ */
+function showLoginForm() {
+    document.getElementById("signupBox").classList.add("d-none");
+    document.getElementById("loginBox").classList.remove("d-none");
+}
+
+/**
+ * Hides the Login card and reveals the Sign Up card.
+ * Called when user clicks "New here? Create an account"
+ */
+function showSignupForm() {
+    document.getElementById("loginBox").classList.add("d-none");
+    document.getElementById("signupBox").classList.remove("d-none");
+}
+
+
+// ============================================================
+// LOGIN MODE TOGGLE — Switch between Username and Email login
+// ============================================================
+function switchLoginMode(mode) {
+
+    currentLoginMode = mode;
+
+    const input          = document.getElementById("loginInput");
+    const toggleUsername = document.getElementById("toggleUsername");
+    const toggleEmail    = document.getElementById("toggleEmail");
+
+    if (mode === "username") {
+        // Show username input
+        input.type          = "text";
+        input.placeholder   = "Enter your username";
+        input.autocomplete  = "username";
+        toggleUsername.classList.add("active");
+        toggleEmail.classList.remove("active");
+
+    } else {
+        // Show email input
+        input.type          = "email";
+        input.placeholder   = "Enter your email address";
+        input.autocomplete  = "email";
+        toggleEmail.classList.add("active");
+        toggleUsername.classList.remove("active");
+    }
+
+    // Clear any previous messages when switching
+    document.getElementById("loginMsg").innerHTML = "";
+}
+
+
+// ============================================================
+// FORGOT PASSWORD — Placeholder only (not functional yet)
+// ============================================================
+/**
+ * This button is created for the UI now, but does not perform
+ * any password reset logic yet. A future update will connect
+ * this to a Flask route that emails a reset link.
+ */
+function forgotPassword() {
+    alert("Password reset is coming soon. Please contact support for now.");
+}
+
+
+// ============================================================
+// REGISTER — Create a new user account
+// ============================================================
+async function registerUser() {
+
+    const username = document.getElementById("signupUsername").value.trim();
+    const email    = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
+    const confirm  = document.getElementById("confirmPassword").value;
+    const msgEl    = document.getElementById("signupMsg");
+
+    // Clear previous message
+    msgEl.innerHTML = "";
+
+    // Basic client-side validation before sending to server
+    if (!username || !email || !password || !confirm) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Please fill in all fields";
+        return;
+    }
+
+    if (password !== confirm) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Passwords do not match";
+        return;
+    }
+
+    if (password.length < 6) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Password must be at least 6 characters";
+        return;
+    }
+
+    try {
+        // Send registration data to Flask /register route
+        const res = await fetch(API_URL + "/register", {
+            method     : "POST",
+            headers    : { "Content-Type": "application/json" },
+            credentials: "include",
+            body       : JSON.stringify({
+                username: username,
+                email   : email,
+                password: password
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // Registration successful — redirect to profile setup
+            msgEl.style.color = "green";
+            msgEl.innerHTML   = "✅ Account created! Redirecting to profile setup...";
+
+            // Temporarily save username so profile.html can auto-fill it
+            localStorage.setItem("tempUser", JSON.stringify({
+                username: username,
+                email   : email
+            }));
+
+            setTimeout(() => {
+                window.location.href = "profile.html";
+            }, 1200);
+
+        } else {
+            // Show error returned by Flask
+            msgEl.style.color = "red";
+            msgEl.innerHTML   = "❌ " + data.error;
+        }
+
+    } catch (err) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Could not connect to server. Is Flask running?";
+        console.error(err);
+    }
+}
+
+
+// ============================================================
+// LOGIN — Log in with username or email + password
+// ============================================================
+async function loginUser() {
+
+    const loginInput = document.getElementById("loginInput").value.trim();
+    const password   = document.getElementById("loginPassword").value;
+    const msgEl      = document.getElementById("loginMsg");
+
+    // Clear previous message
+    msgEl.innerHTML = "";
+
+    if (!loginInput || !password) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Please enter your " + currentLoginMode + " and password";
+        return;
+    }
+
+    // ---- Check if this is an admin login ----
+    // Admin uses email to login, so this only matches in email mode
+    if (loginInput === "admin@nutrisense.com" && password === "admin123") {
+
+        try {
+            const res = await fetch(API_URL + "/admin/login", {
+                method     : "POST",
+                headers    : { "Content-Type": "application/json" },
+                credentials: "include",
+                body       : JSON.stringify({
+                    email   : loginInput,
+                    password: password
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                msgEl.style.color = "green";
+                msgEl.innerHTML   = "✅ Welcome Admin! Redirecting...";
+                setTimeout(() => { window.location.href = "admin.html"; }, 1000);
+            } else {
+                msgEl.style.color = "red";
+                msgEl.innerHTML   = "❌ " + data.error;
+            }
+
+        } catch (err) {
+            msgEl.style.color = "red";
+            msgEl.innerHTML   = "❌ Could not connect to server. Is Flask running?";
+        }
+
+        return;
+    }
+
+    // ---- Normal user login ----
+    // The Flask /login route accepts either username or email
+    // We send the input as "login" field — Flask decides which to use
+    try {
+        const res = await fetch(API_URL + "/login", {
+            method     : "POST",
+            headers    : { "Content-Type": "application/json" },
+            credentials: "include",
+            body       : JSON.stringify({
+                login   : loginInput,
+                password: password
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msgEl.style.color = "green";
+            msgEl.innerHTML   = "✅ Login successful! Redirecting...";
+
+            // Save basic user info to localStorage for frontend pages
+            localStorage.setItem("currentUser", JSON.stringify({
+                user_id : data.user_id,
+                username: data.username
+            }));
+
+            setTimeout(() => {
+                window.location.href = "meal_logger.html";
+            }, 1000);
+
+        } else {
+            msgEl.style.color = "red";
+            msgEl.innerHTML   = "❌ " + data.error;
+        }
+
+    } catch (err) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Could not connect to server. Is Flask running?";
+        console.error(err);
+    }
+}
+
+</script>
+
+</body>
+</html>

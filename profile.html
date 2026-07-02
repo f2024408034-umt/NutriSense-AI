@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ============================================================
+     META & SEO
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NutriSense AI — Complete your health profile to get personalized nutrition recommendations.">
+<title>Profile Setup | NutriSense AI</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f7fa;
+    min-height: 100vh;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2E8B57;
+}
+
+/* ============================================================
+   PROFILE CARD — Main form container
+   ============================================================ */
+.profile-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+   HEADING
+   ============================================================ */
+.heading h1 {
+    color: #2E8B57;
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.heading p {
+    color: #666;
+    font-size: 15px;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.15);
+}
+
+/* ============================================================
+   GOAL SELECTION CARDS
+   ============================================================
+   Each health goal is a clickable card with a radio button.
+   When selected, the border turns green.
+   ============================================================ */
+.goal-card {
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s;
+    display: block;
+    padding: 14px;
+    text-align: center;
+    font-weight: 600;
+    color: #444;
+    font-size: 15px;
+}
+
+.goal-card:hover {
+    border-color: #2E8B57;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(46, 139, 87, 0.1);
+}
+
+/* Green border when radio inside is checked */
+.goal-card:has(input[type="radio"]:checked) {
+    border-color: #2E8B57;
+    background: #f0faf4;
+    color: #2E8B57;
+}
+
+/* ============================================================
+   MEDICAL CONDITIONS CHECKBOXES
+   ============================================================ */
+.checkbox-group label {
+    font-weight: normal;
+    color: #444;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+.btn-brand {
+    background: #2E8B57;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 14px;
+    transition: 0.2s;
+}
+
+.btn-brand:hover {
+    background: #246b44;
+    color: white;
+}
+
+/* ============================================================
+   SUCCESS / ERROR MESSAGE
+   ============================================================ */
+.message {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 500;
+    min-height: 22px;
+}
+
+/* ============================================================
+   SECTION DIVIDER
+   Used to visually separate form sections
+   ============================================================ */
+.section-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #2E8B57;
+    border-bottom: 2px solid #e8f5ee;
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 576px) {
+    .heading h1 {
+        font-size: 24px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar navbar-light bg-white">
+    <div class="container">
+        <span class="logo">🥗 NutriSense AI</span>
+    </div>
+</nav>
+
+
+<!-- ============================================================
+     PROFILE FORM
+     ============================================================ -->
+<div class="container my-5" style="max-width: 900px;">
+<div class="profile-card p-4 p-md-5">
+
+    <!-- Page Heading -->
+    <div class="heading text-center mb-5">
+        <h1>Complete Your Profile</h1>
+        <p>Tell us about yourself so we can provide personalized nutrition recommendations.</p>
+    </div>
+
+    <form onsubmit="saveProfile(); return false;">
+    <div class="row g-4">
+
+        <!-- ================================================
+             SECTION 1 — PERSONAL INFORMATION
+             ================================================ -->
+        <div class="col-12">
+            <div class="section-label">Personal Information</div>
+        </div>
+
+        <!-- First Name -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">First Name</label>
+            <input
+                type="text"
+                id="firstName"
+                class="form-control"
+                placeholder="e.g. Umar"
+                required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">Last Name</label>
+            <input
+                type="text"
+                id="lastName"
+                class="form-control"
+                placeholder="e.g. Farooq"
+                required>
+        </div>
+
+        <!-- Age -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">Age</label>
+            <input
+                type="number"
+                id="age"
+                class="form-control"
+                placeholder="e.g. 20"
+                min="1"
+                max="120"
+                required>
+        </div>
+
+        <!-- Gender -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">Gender</label>
+            <select id="gender" class="form-select" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+
+        <!-- ================================================
+             SECTION 2 — BODY MEASUREMENTS
+             ================================================ -->
+        <div class="col-12 mt-2">
+            <div class="section-label">Body Measurements</div>
+        </div>
+
+        <!-- Height -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">Height (cm)</label>
+            <input
+                type="number"
+                id="height"
+                class="form-control"
+                placeholder="e.g. 175"
+                min="50"
+                max="300"
+                required>
+        </div>
+
+        <!-- Weight -->
+        <div class="col-12 col-md-6">
+            <label class="form-label">Weight (kg)</label>
+            <input
+                type="number"
+                id="weight"
+                class="form-control"
+                placeholder="e.g. 70"
+                min="10"
+                max="500"
+                required>
+        </div>
+
+        <!-- Activity Level -->
+        <div class="col-12">
+            <label class="form-label">Activity Level</label>
+            <select id="activity" class="form-select" required>
+                <option value="">Select your daily activity level</option>
+                <option value="Sedentary">Sedentary — Little or no exercise</option>
+                <option value="Lightly Active">Lightly Active — Light exercise 1-3 days/week</option>
+                <option value="Moderately Active">Moderately Active — Moderate exercise 3-5 days/week</option>
+                <option value="Very Active">Very Active — Hard exercise 6-7 days/week</option>
+            </select>
+        </div>
+
+
+        <!-- ================================================
+             SECTION 3 — HEALTH GOAL
+             Each goal is a clickable card with radio button.
+             ================================================ -->
+        <div class="col-12 mt-2">
+            <div class="section-label">Health Goal</div>
+        </div>
+
+        <div class="col-12">
+        <div class="row g-3">
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="goal-card">
+                    <input type="radio" name="goal" value="Weight Loss" class="form-check-input me-2" required>
+                    🥗 Weight Loss
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="goal-card">
+                    <input type="radio" name="goal" value="Weight Gain" class="form-check-input me-2">
+                    🍗 Weight Gain
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="goal-card">
+                    <input type="radio" name="goal" value="Muscle Gain" class="form-check-input me-2">
+                    💪 Muscle Gain
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="goal-card">
+                    <input type="radio" name="goal" value="Maintain Weight" class="form-check-input me-2">
+                    ⚖️ Maintain Weight
+                </label>
+            </div>
+
+        </div>
+        </div>
+
+
+        <!-- ================================================
+             SECTION 4 — MEDICAL CONDITIONS
+             User can select multiple conditions.
+             This helps AI give better health warnings.
+             ================================================ -->
+        <div class="col-12 mt-2">
+            <div class="section-label">Medical Conditions</div>
+            <p class="text-muted mt-1" style="font-size:13px;">
+                Select any conditions you have. This helps us give you safer recommendations.
+            </p>
+        </div>
+
+        <div class="col-12">
+        <div class="row g-3 checkbox-group">
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="d-flex align-items-center gap-2">
+                    <input type="checkbox" value="Diabetes" class="form-check-input">
+                    Diabetes
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="d-flex align-items-center gap-2">
+                    <input type="checkbox" value="Hypertension" class="form-check-input">
+                    Hypertension
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="d-flex align-items-center gap-2">
+                    <input type="checkbox" value="Iron Deficiency" class="form-check-input">
+                    Iron Deficiency
+                </label>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="d-flex align-items-center gap-2">
+                    <input type="checkbox" value="None" class="form-check-input">
+                    None
+                </label>
+            </div>
+
+        </div>
+        </div>
+
+
+        <!-- ================================================
+             SUBMIT BUTTON
+             ================================================ -->
+        <div class="col-12 mt-2">
+            <button type="submit" class="btn btn-brand w-100">
+                Save Profile &amp; Continue →
+            </button>
+            <div class="message" id="message"></div>
+        </div>
+
+    </div>
+    </form>
+
+</div>
+</div>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+
+// Base URL for all Flask API calls
+const API_URL = "http://127.0.0.1:5000";
+
+
+// ============================================================
+// PAGE LOAD — Auto-fill fields if profile already exists
+// ============================================================
+window.onload = async function () {
+
+    // Auto-fill username from signup step (index.html saved it)
+    const tempUser = JSON.parse(localStorage.getItem("tempUser") || "null");
+    if (tempUser && tempUser.username) {
+        // Show username as a greeting in the heading
+        const heading = document.querySelector(".heading p");
+        if (heading) {
+            heading.textContent = `Welcome, ${tempUser.username}! Let's set up your health profile.`;
+        }
+    }
+
+    // Load existing profile from Flask if user has already filled it before
+    // This allows editing the profile later without re-entering everything
+    try {
+        const res = await fetch(API_URL + "/get-profile", {
+            credentials: "include"
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+
+            // Fill each field only if data exists for it
+            if (data.first_name) document.getElementById("firstName").value = data.first_name;
+            if (data.last_name)  document.getElementById("lastName").value  = data.last_name;
+            if (data.age)        document.getElementById("age").value       = data.age;
+            if (data.gender)     document.getElementById("gender").value    = data.gender;
+            if (data.height)     document.getElementById("height").value    = data.height;
+            if (data.weight)     document.getElementById("weight").value    = data.weight;
+            if (data.activity_level) {
+                document.getElementById("activity").value = data.activity_level;
+            }
+
+            // Check the correct goal radio button
+            if (data.goal) {
+                const goalRadio = document.querySelector(
+                    `input[name="goal"][value="${data.goal}"]`
+                );
+                if (goalRadio) goalRadio.checked = true;
+            }
+
+            // Check the correct medical condition checkboxes
+            if (data.conditions) {
+                const saved = data.conditions.split(", ");
+                document.querySelectorAll('.checkbox-group input[type="checkbox"]')
+                    .forEach(cb => {
+                        if (saved.includes(cb.value)) cb.checked = true;
+                    });
+            }
+        }
+
+    } catch (err) {
+        // Not logged in or server not running — silently ignore
+        console.log("Could not load existing profile:", err);
+    }
+};
+
+
+// ============================================================
+// SAVE PROFILE — Send profile data to Flask
+// ============================================================
+async function saveProfile() {
+
+    // Collect all form values
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName  = document.getElementById("lastName").value.trim();
+    const age       = document.getElementById("age").value;
+    const gender    = document.getElementById("gender").value;
+    const height    = document.getElementById("height").value;
+    const weight    = document.getElementById("weight").value;
+    const activity  = document.getElementById("activity").value;
+    const goalEl    = document.querySelector('input[name="goal"]:checked');
+    const msgEl     = document.getElementById("message");
+
+    // Collect all checked medical conditions into an array
+    const conditions = [];
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')
+        .forEach(cb => conditions.push(cb.value));
+
+    // ---- Client-side validation ----
+    // Check all required fields are filled
+    if (!firstName || !lastName || !age || !gender || !height || !weight || !activity) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Please fill in all fields";
+        return;
+    }
+
+    // Check a health goal is selected
+    if (!goalEl) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Please select a health goal";
+        return;
+    }
+
+    // Show saving indicator
+    msgEl.style.color = "#2E8B57";
+    msgEl.innerHTML   = "⏳ Saving your profile...";
+
+    // ---- Send to Flask ----
+    try {
+        const res = await fetch(API_URL + "/save-profile", {
+            method     : "POST",
+            headers    : { "Content-Type": "application/json" },
+            credentials: "include",
+            body       : JSON.stringify({
+                first_name    : firstName,
+                last_name     : lastName,
+                age           : parseInt(age),
+                gender        : gender,
+                activity_level: activity,
+                height        : parseFloat(height),
+                weight        : parseFloat(weight),
+                goal          : goalEl.value,
+                conditions    : conditions
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+
+            // Save to localStorage as backup for other pages
+            // (meal_logger, recommendations use this for quick access)
+            localStorage.setItem("profile", JSON.stringify({
+                first_name : firstName,
+                last_name  : lastName,
+                age, gender, height, weight,
+                activity_level: activity,
+                goal      : goalEl.value,
+                conditions
+            }));
+
+            // Clear temp signup data — no longer needed
+            localStorage.removeItem("tempUser");
+
+            msgEl.style.color = "green";
+            msgEl.innerHTML   = "✅ Profile saved successfully!";
+
+            // Redirect to meal logger after short delay
+            setTimeout(() => {
+                window.location.href = "meal_logger.html";
+            }, 1200);
+
+        } else {
+            // Show error from Flask
+            msgEl.style.color = "red";
+            msgEl.innerHTML   = "❌ " + (data.error || "An error occurred");
+        }
+
+    } catch (err) {
+        msgEl.style.color = "red";
+        msgEl.innerHTML   = "❌ Could not connect to server. Is Flask running?";
+        console.error(err);
+    }
+}
+
+</script>
+
+</body>
+</html>

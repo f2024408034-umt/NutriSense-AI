@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ============================================================
+     META
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Report | NutriSense AI</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f7fa;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2E8B57;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    color: #2E8B57;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+/* ============================================================
+   SUMMARY CARDS (top row)
+   ============================================================ */
+.summary-card {
+    border: none;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    background: white;
+    padding: 20px;
+}
+
+.summary-card h3 {
+    color: #2E8B57;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.summary-card .value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #222;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress {
+    height: 20px;
+    border-radius: 20px;
+}
+
+.progress-bar {
+    background: #2E8B57;
+    transition: width 0.5s ease;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+thead th {
+    background: #2E8B57;
+    color: white;
+}
+
+/* ============================================================
+   ANALYSIS BOXES
+   ============================================================ */
+.analysis-box {
+    background: #f8fff9;
+    border-left: 5px solid #2E8B57;
+    border-radius: 10px;
+    padding: 15px 18px;
+    line-height: 1.9;
+}
+
+.analysis-box p {
+    margin-bottom: 4px;
+}
+
+/* ============================================================
+   SCORE BADGE
+   ============================================================ */
+.score-badge {
+    display: inline-block;
+    background: #2E8B57;
+    color: white;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 30px;
+    font-size: 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar navbar-light bg-white">
+<div class="container d-flex justify-content-between align-items-center">
+    <span class="logo">🥗 NutriSense AI</span>
+    <div class="d-flex align-items-center gap-2">
+        <a href="meal_logger.html"    class="btn btn-sm btn-outline-success">🍽️ Meal Logger</a>
+        <a href="recommendations.html" class="btn btn-sm btn-outline-success">🤖 Recommendations</a>
+        <span id="welcomeUser" class="text-muted" style="font-size:14px;">Weekly Report</span>
+    </div>
+</div>
+</nav>
+
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<div class="container my-4">
+
+
+    <!-- --------------------------------------------------------
+         SUMMARY CARDS — Total Calories, Meals, Water, Score
+         All loaded from Flask /weekly-report
+         -------------------------------------------------------- -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>Total Calories</h3>
+                <div class="value" id="totalCalories">-</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>Meals Logged</h3>
+                <div class="value" id="totalMeals">-</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>Water Intake</h3>
+                <div class="value" id="totalWater">-</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="summary-card">
+                <h3>Nutrition Score</h3>
+                <div class="value" id="weeklyScore">-</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         AVERAGE DAILY CALORIES PROGRESS BAR
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+
+        <h2>📊 Average Daily Calories</h2>
+
+        <div class="progress mb-3">
+            <div
+                class="progress-bar"
+                id="avgProgress"
+                role="progressbar"
+                style="width: 0%"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100">
+            </div>
+        </div>
+
+        <p class="text-muted mb-0" id="avgCaloriesText">Loading...</p>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         WEEKLY NUTRITION LOG TABLE
+         Shows each day of the last 7 days with calorie data.
+         Days with no meals show 0.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+
+        <h2>📅 Weekly Nutrition Log</h2>
+
+        <div class="table-responsive">
+        <table class="table text-center align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Calories</th>
+                    <th>Protein</th>
+                    <th>Carbs</th>
+                    <th>Meals</th>
+                </tr>
+            </thead>
+            <tbody id="weeklyTableBody">
+                <tr>
+                    <td colspan="5" class="empty-state">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         BEST DAY OF THE WEEK
+         The day with the most balanced calorie intake.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🏆 Best Day This Week</h2>
+        <p id="bestDay" class="mb-0">Analyzing...</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         AI WEEKLY ANALYSIS
+         Generated from the weekly data — warnings + positives.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>🤖 AI Weekly Analysis</h2>
+        <div class="analysis-box" id="weeklyAnalysis">
+            Loading analysis...
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         AREAS FOR IMPROVEMENT
+         Actionable suggestions based on the week's data.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>📈 Areas For Improvement</h2>
+        <div class="analysis-box" id="improvementSection">
+            Loading...
+        </div>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         WEEKLY HEALTH TIP
+         A random tip from the WHO tips list — changes each visit.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>💡 Weekly Health Tip</h2>
+        <div class="analysis-box">
+            <p id="weeklyTip">Loading...</p>
+        </div>
+    </div>
+
+
+</div><!-- /container -->
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+
+// Base URL for all Flask API calls
+const API_URL = "http://127.0.0.1:5000";
+
+// Water glasses — still from localStorage (simple preference)
+const waterGlasses = parseInt(localStorage.getItem("waterGlasses") || "0");
+
+// Health tips shown at the bottom — rotated randomly each visit
+const WEEKLY_TIPS = [
+    "Consistency is more important than perfection.",
+    "Drink water throughout the day instead of all at once.",
+    "Include vegetables in at least two meals daily.",
+    "Protein helps maintain muscle and keeps you full.",
+    "Try reducing sugary drinks this week.",
+    "Plan meals ahead to avoid unhealthy choices.",
+    "Sleep well — poor sleep increases hunger hormones.",
+    "Eating slowly helps your body recognize fullness.",
+    "A balanced plate has protein, carbs, and vegetables.",
+    "Small daily improvements lead to big long-term results."
+];
+
+
+// ============================================================
+// PAGE LOAD
+// ============================================================
+window.onload = async function () {
+    loadWeeklyTip();        // Show a random health tip immediately
+    await loadWeeklyReport(); // Load all data from Flask
+};
+
+
+// ============================================================
+// LOAD WEEKLY REPORT FROM FLASK
+// ============================================================
+// Fetches the last 7 days of meal data from Flask /weekly-report
+// and populates every section of the page.
+// ============================================================
+async function loadWeeklyReport() {
+    try {
+        const res  = await fetch(API_URL + "/weekly-report", {
+            credentials: "include"
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            // Session expired — redirect to login
+            if (res.status === 401) {
+                window.location.href = "index.html";
+                return;
+            }
+            showError("Failed to load weekly report: " + data.error);
+            return;
+        }
+
+        // ---- Populate every section with real data ----
+        renderWelcome(data.display_name);
+        renderSummaryCards(data);
+        renderProgressBar(data.avg_calories);
+        renderWeeklyTable(data.daily_data);
+        renderBestDay(data.daily_data);
+        renderAIAnalysis(data);
+        renderImprovements(data);
+
+    } catch (err) {
+        console.error("Weekly report load error:", err);
+        showError("Could not connect to server. Is Flask running?");
+    }
+}
+
+
+// ============================================================
+// RENDER WELCOME MESSAGE
+// ============================================================
+function renderWelcome(name) {
+    document.getElementById("welcomeUser").textContent =
+        (name || "User") + "'s Weekly Report";
+}
+
+
+// ============================================================
+// RENDER SUMMARY CARDS
+// ============================================================
+function renderSummaryCards(data) {
+    document.getElementById("totalCalories").textContent = data.total_calories || 0;
+    document.getElementById("totalMeals").textContent    = data.total_meals    || 0;
+    document.getElementById("totalWater").textContent    = waterGlasses + " glasses";
+    document.getElementById("weeklyScore").textContent   = (data.nutrition_score || 0) + "/100";
+}
+
+
+// ============================================================
+// RENDER AVERAGE CALORIES PROGRESS BAR
+// ============================================================
+function renderProgressBar(avgCalories) {
+    const pct = Math.min((avgCalories / 1800) * 100, 100);
+
+    document.getElementById("avgProgress").style.width = pct + "%";
+    document.getElementById("avgProgress").setAttribute("aria-valuenow", pct);
+    document.getElementById("avgCaloriesText").textContent =
+        `${avgCalories} kcal/day average  (Goal: 1800 kcal/day)`;
+}
+
+
+// ============================================================
+// RENDER WEEKLY TABLE
+// ============================================================
+// Shows each day that had meals logged in the last 7 days.
+// If no meals logged at all, shows an empty state message.
+// ============================================================
+function renderWeeklyTable(dailyData) {
+
+    const tbody = document.getElementById("weeklyTableBody");
+
+    if (!dailyData || dailyData.length === 0) {
+        tbody.innerHTML =
+            '<tr><td colspan="5" class="empty-state">No meals logged in the last 7 days.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = dailyData.map(day => `
+        <tr>
+            <td>${formatDate(day.date)}</td>
+            <td>${day.calories} kcal</td>
+            <td>${day.protein}g</td>
+            <td>${day.carbs}g</td>
+            <td>${day.meals.length} meal${day.meals.length !== 1 ? "s" : ""}</td>
+        </tr>
+    `).join("");
+}
+
+
+// ============================================================
+// RENDER BEST DAY
+// ============================================================
+// Finds the day with calorie intake closest to 1800 kcal goal.
+// ============================================================
+function renderBestDay(dailyData) {
+
+    const el = document.getElementById("bestDay");
+
+    if (!dailyData || dailyData.length === 0) {
+        el.textContent = "No data available yet — start logging meals!";
+        return;
+    }
+
+    // Best day = closest calories to 1800 goal
+    const best = dailyData.reduce((prev, curr) => {
+        return Math.abs(curr.calories - 1800) < Math.abs(prev.calories - 1800)
+            ? curr : prev;
+    });
+
+    el.textContent =
+        `🏆 ${formatDate(best.date)} with ${best.calories} kcal — closest to your daily goal!`;
+}
+
+
+// ============================================================
+// RENDER AI ANALYSIS
+// ============================================================
+// Generates a text analysis of the week based on the data.
+// ============================================================
+function renderAIAnalysis(data) {
+
+    const el       = document.getElementById("weeklyAnalysis");
+    const analysis = [];
+
+    const avg = data.avg_calories;
+    const pro = data.total_protein;
+
+    // Calorie analysis
+    if (avg === 0) {
+        analysis.push("ℹ️ No meals were logged this week yet.");
+    } else if (avg < 1200) {
+        analysis.push("⚠️ Your average calorie intake is below the healthy range (1200 kcal).");
+    } else if (avg > 1800) {
+        analysis.push("⚠️ Your average calorie intake exceeded the 1800 kcal daily goal.");
+    } else {
+        analysis.push("✅ Your calorie intake remained balanced throughout the week.");
+    }
+
+    // Protein analysis
+    if (pro < 60 && data.total_meals > 0) {
+        analysis.push("💪 Your weekly protein intake is low — include more chicken, eggs, or legumes.");
+    } else if (pro >= 60) {
+        analysis.push("✅ Good protein intake this week — keep it up!");
+    }
+
+    // Hydration
+    if (waterGlasses < 8) {
+        analysis.push("💧 Water intake needs improvement — aim for 8 glasses per day.");
+    } else {
+        analysis.push("✅ Good hydration this week!");
+    }
+
+    // Meal consistency
+    if (data.total_meals >= 14) {
+        analysis.push("✅ Excellent meal logging consistency — you logged meals every day!");
+    } else if (data.total_meals >= 7) {
+        analysis.push("✅ Good meal logging consistency this week.");
+    } else if (data.total_meals > 0) {
+        analysis.push("📋 Try to log meals every day for a more accurate weekly analysis.");
+    }
+
+    el.innerHTML = analysis.map(item => `<p>${item}</p>`).join("");
+}
+
+
+// ============================================================
+// RENDER IMPROVEMENTS
+// ============================================================
+// Actionable suggestions based on the weekly data.
+// ============================================================
+function renderImprovements(data) {
+
+    const el          = document.getElementById("improvementSection");
+    const suggestions = [];
+
+    if (data.avg_calories > 1800) {
+        suggestions.push("Reduce high-calorie snacks between meals.");
+    }
+    if (data.avg_calories < 1200 && data.total_meals > 0) {
+        suggestions.push("Add one more balanced meal each day.");
+    }
+    if (data.total_protein < 60 && data.total_meals > 0) {
+        suggestions.push("Include protein-rich foods like eggs, chicken, or lentils.");
+    }
+    if (waterGlasses < 8) {
+        suggestions.push("Set a reminder to drink water every 2 hours.");
+    }
+    if (data.total_meals < 7) {
+        suggestions.push("Log at least one meal per day for better tracking.");
+    }
+
+    if (suggestions.length === 0) {
+        suggestions.push("Great work this week! Keep maintaining your healthy habits.");
+    }
+
+    el.innerHTML = suggestions.map(s => `<p>✔ ${s}</p>`).join("");
+}
+
+
+// ============================================================
+// LOAD RANDOM HEALTH TIP
+// ============================================================
+function loadWeeklyTip() {
+    const tip = WEEKLY_TIPS[Math.floor(Math.random() * WEEKLY_TIPS.length)];
+    document.getElementById("weeklyTip").textContent = tip;
+}
+
+
+// ============================================================
+// HELPER — Format date string to readable format
+// "2025-06-10" → "Tue, Jun 10"
+// ============================================================
+function formatDate(dateStr) {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("en-US", {
+        weekday: "short",
+        month  : "short",
+        day    : "numeric"
+    });
+}
+
+
+// ============================================================
+// HELPER — Show error message on page
+// ============================================================
+function showError(msg) {
+    document.getElementById("weeklyAnalysis").innerHTML =
+        `<p style="color:red;">❌ ${msg}</p>`;
+}
+
+</script>
+
+<!-- WHO Health Tips Widget -->
+<script src="who_tips.js"></script>
+<script>
+    // ============================================================
+    // WHO HEALTH TIPS WIDGET
+    // ============================================================
+    // Shows a rotating floating card with WHO nutrition tips.
+    // See who_tips.js for the full implementation.
+    // ============================================================
+    initWhoTips();
+</script>
+
+</body>
+</html>

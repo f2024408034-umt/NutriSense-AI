@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- ============================================================
+     META
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meal Logger | NutriSense AI</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f7fa;
+    color: #333;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    color: #2E8B57;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+   SUMMARY CARDS (Calories, Protein, Carbs, Fat)
+   ============================================================ */
+.summary h3 {
+    color: #2E8B57;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.summary .value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #222;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-brand {
+    background: #2E8B57;
+    color: #fff;
+    border-color: #2E8B57;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-brand:hover {
+    background: #256e46;
+    border-color: #256e46;
+    color: #fff;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress {
+    height: 18px;
+    border-radius: 20px;
+}
+
+.progress-bar {
+    background: #2E8B57;
+    transition: width 0.4s ease;
+}
+
+/* ============================================================
+   MEAL HISTORY TABLE
+   ============================================================ */
+thead th {
+    background: #2E8B57;
+    color: #fff;
+}
+
+/* ============================================================
+   AI RECOMMENDATIONS BOX
+   ============================================================ */
+.ai-box {
+    background: #f8fff9;
+    border-left: 5px solid #2E8B57;
+    border-radius: 10px;
+    padding: 15px;
+    line-height: 1.8;
+}
+
+/* ============================================================
+   STATUS MESSAGES (success / error feedback)
+   ============================================================ */
+.status-msg {
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 20px;
+    margin-top: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     Shows username and provides Logout / Delete Account actions.
+     ============================================================ -->
+<nav class="navbar navbar-light bg-white">
+<div class="container d-flex justify-content-between align-items-center">
+
+    <span class="logo">🥗 NutriSense AI</span>
+
+    <div class="d-flex align-items-center gap-2">
+        <span id="welcomeMsg">Welcome</span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="logoutUser()">Logout</button>
+        <button class="btn btn-sm btn-outline-danger"   onclick="deleteMyAccount()">Delete Account</button>
+    </div>
+
+</div>
+</nav>
+
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<div class="container my-4">
+
+
+    <!-- --------------------------------------------------------
+         USER PROFILE CARD
+         Loaded from Flask /get-profile on page load.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>User Profile</h2>
+        <p><strong>Name:</strong> <span id="profileName">-</span></p>
+        <p><strong>Goal:</strong> <span id="profileGoal">-</span></p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         NUTRITION SUMMARY CARDS
+         Updated every time a meal is added or page loads.
+         -------------------------------------------------------- -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-md-3">
+            <div class="card summary p-4 text-center h-100">
+                <h3>Calories</h3>
+                <div class="value" id="caloriesTotal">0</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card summary p-4 text-center h-100">
+                <h3>Protein</h3>
+                <div class="value" id="proteinTotal">0g</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card summary p-4 text-center h-100">
+                <h3>Carbs</h3>
+                <div class="value" id="carbsTotal">0g</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card summary p-4 text-center h-100">
+                <h3>Fat</h3>
+                <div class="value" id="fatTotal">0g</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         ADD MEAL CARD
+         Loads food options from Flask /foods.
+         On submit: calls Flask /log-food to save to database.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+
+        <h2>Add Meal</h2>
+
+        <!-- Meal Type -->
+        <label class="form-label mt-2">Meal Type</label>
+        <select id="mealType" class="form-select">
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snack">Snack</option>
+        </select>
+
+        <!-- Food selection — populated from Flask /foods -->
+        <label class="form-label mt-3">Food</label>
+        <select id="foodSelect" class="form-select">
+            <option value="">Loading foods...</option>
+        </select>
+
+        <!-- Quantity -->
+        <label class="form-label mt-3">Quantity (servings)</label>
+        <input type="number" id="qty" class="form-control" value="1" min="1">
+
+        <button class="btn btn-brand w-100 mt-3" onclick="addMeal()">
+            Add Meal
+        </button>
+
+        <!-- Feedback message after adding a meal -->
+        <div class="status-msg" id="mealMsg"></div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         WATER INTAKE CARD
+         Stored in localStorage (no backend needed for water).
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>Water Intake</h2>
+        <p id="waterDisplay" class="mb-3">0 / 8 Glasses</p>
+        <button class="btn btn-brand" onclick="addWater()">+ Add Glass</button>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         CALORIE PROGRESS BAR
+         Shows today's calories vs the 1800 kcal daily goal.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+        <h2>Daily Progress</h2>
+        <p>Calories Goal: <strong>1800 kcal</strong></p>
+        <div class="progress">
+            <div
+                class="progress-bar"
+                id="calFill"
+                role="progressbar"
+                style="width: 0%"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100">
+            </div>
+        </div>
+        <p class="mt-2 text-muted" id="progressText">0 / 1800 kcal</p>
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         AI RECOMMENDATIONS
+         Loaded from Flask /analyze which reads today's meals
+         from the database and returns health warnings and tips.
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+
+        <!-- Header with button on right side -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">AI Recommendations</h2>
+            <a href="recommendations.html"
+               class="btn btn-sm btn-success">
+                 View Full Recommendations
+            </a>
+        </div>
+
+        <div class="ai-box" id="aiBox">
+            Add meals to get personalized recommendations.
+        </div>
+
+    </div>
+
+
+    <!-- --------------------------------------------------------
+         MEAL HISTORY TABLE
+         Loaded from Flask /dashboard — shows all meals
+         logged today (pulled from database, not localStorage).
+         -------------------------------------------------------- -->
+    <div class="card p-4 mb-4">
+
+        <!-- Header with Weekly Report button on top right -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Today's Meal History</h2>
+            <a href="weekly_reports.html"
+               class="btn btn-sm btn-success">
+                 Weekly Report
+            </a>
+        </div>
+
+        <div class="table-responsive">
+        <table class="table text-center align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Meal Type</th>
+                    <th>Food</th>
+                    <th>Qty</th>
+                    <th>Calories</th>
+                    <th>Protein</th>
+                    <th>Carbs</th>
+                </tr>
+            </thead>
+            <tbody id="mealTableBody">
+                <tr>
+                    <td colspan="6" class="text-muted">No meals logged yet today.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+    </div>
+
+
+</div><!-- /container -->
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+
+// Base URL for all Flask API calls
+const API_URL = "http://127.0.0.1:5000";
+
+// Water glasses count — stored in localStorage (simple preference)
+let waterGlasses = parseInt(localStorage.getItem("waterGlasses") || "0");
+
+// Foods list loaded from Flask — stored here for quick lookup
+// when calculating nutrition preview before saving
+let foodsData = [];
+
+
+// ============================================================
+// PAGE LOAD — Run everything when the page opens
+// ============================================================
+window.onload = async function () {
+    await loadProfile();   // Load user name and goal from Flask
+    await loadFoods();     // Load food dropdown from Flask /foods
+    await loadDashboard(); // Load today's meals from Flask /dashboard
+    await loadAnalysis();  // Load AI recommendations from Flask /analyze
+    renderWater();         // Render water intake count from localStorage
+};
+
+
+// ============================================================
+// LOAD PROFILE
+// ============================================================
+// Fetches the logged-in user's name and goal from Flask.
+// If the session has expired, redirects to login page.
+// ============================================================
+async function loadProfile() {
+    try {
+        const res = await fetch(API_URL + "/get-profile", {
+            credentials: "include"
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+
+            // Show first + last name, fallback to username
+            const displayName = [data.first_name, data.last_name]
+                .filter(Boolean)
+                .join(" ") || data.username || "User";
+
+            document.getElementById("profileName").textContent  = displayName;
+            document.getElementById("profileGoal").textContent  = data.goal || "-";
+            document.getElementById("welcomeMsg").textContent   = "Welcome, " + displayName;
+
+            // Save to localStorage as backup for other pages
+            localStorage.setItem("profile", JSON.stringify(data));
+
+        } else {
+            // Session expired — redirect to login
+            window.location.href = "index.html";
+        }
+
+    } catch (err) {
+        console.error("Profile load error:", err);
+    }
+}
+
+
+// ============================================================
+// LOAD FOODS
+// ============================================================
+// Fetches the complete food list from Flask /foods and
+// populates the food dropdown select element.
+// ============================================================
+async function loadFoods() {
+    try {
+        const res  = await fetch(API_URL + "/foods", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok && data.foods) {
+            foodsData = data.foods;   // Save for nutrition lookup later
+
+            const select = document.getElementById("foodSelect");
+            select.innerHTML = "";   // Clear the "Loading..." placeholder
+
+            // Add each food as an option
+            // Store the food ID in the value so we can send it to Flask
+            data.foods.forEach(food => {
+                const option   = document.createElement("option");
+                option.value   = food.id;
+                option.text    = `${food.food_name} (${food.calories} kcal)`;
+                select.appendChild(option);
+            });
+        }
+
+    } catch (err) {
+        console.error("Foods load error:", err);
+        document.getElementById("foodSelect").innerHTML =
+            '<option value="">Failed to load foods</option>';
+    }
+}
+
+
+// ============================================================
+// LOAD DASHBOARD
+// ============================================================
+// Fetches today's meal logs from Flask /dashboard and
+// renders them in the meal history table + summary cards.
+// ============================================================
+async function loadDashboard() {
+    try {
+        const res  = await fetch(API_URL + "/dashboard", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok) {
+            renderMealTable(data.meals);
+            renderSummaryCards(
+                data.total_calories,
+                data.total_protein,
+                data.total_carbs,
+                data.total_fat || 0
+            );
+        }
+
+    } catch (err) {
+        console.error("Dashboard load error:", err);
+    }
+}
+
+
+// ============================================================
+// LOAD ANALYSIS (AI Recommendations)
+// ============================================================
+// Fetches health warnings and goal-based suggestions from
+// Flask /analyze and displays them in the AI box.
+// ============================================================
+async function loadAnalysis() {
+    try {
+        const res  = await fetch(API_URL + "/analyze", { credentials: "include" });
+        const data = await res.json();
+
+        if (res.ok) {
+            const aiBox = document.getElementById("aiBox");
+            let html    = "";
+
+            if (data.warnings)    data.warnings.forEach(w    => { html += `<p>${w}</p>`; });
+            if (data.suggestions) data.suggestions.forEach(s => { html += `<p>${s}</p>`; });
+
+            aiBox.innerHTML = html || "<p>✅ All looks good today!</p>";
+        }
+
+    } catch (err) {
+        console.error("Analysis load error:", err);
+    }
+}
+
+
+// ============================================================
+// ADD MEAL
+// ============================================================
+// Sends the selected food + quantity to Flask /log-food.
+// After saving, refreshes the dashboard and analysis so
+// the page reflects the new meal immediately.
+// ============================================================
+async function addMeal() {
+
+    const foodId   = document.getElementById("foodSelect").value;
+    const mealType = document.getElementById("mealType").value;
+    const qty      = parseInt(document.getElementById("qty").value) || 1;
+    const msgEl    = document.getElementById("mealMsg");
+
+    if (!foodId) {
+        msgEl.style.color = "red";
+        msgEl.textContent = "❌ Please select a food item";
+        return;
+    }
+
+    msgEl.style.color = "#2E8B57";
+    msgEl.textContent = "⏳ Saving...";
+
+    try {
+        const res = await fetch(API_URL + "/log-food", {
+            method     : "POST",
+            headers    : { "Content-Type": "application/json" },
+            credentials: "include",
+            body       : JSON.stringify({
+                food_id  : parseInt(foodId),
+                meal_type: mealType,
+                quantity : qty
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msgEl.style.color = "green";
+            msgEl.textContent = "✅ " + data.message;
+
+            // Reset quantity back to 1 after adding
+            document.getElementById("qty").value = 1;
+
+            // Refresh dashboard and analysis to show the new meal
+            await loadDashboard();
+            await loadAnalysis();
+
+            // Clear message after a moment
+            setTimeout(() => { msgEl.textContent = ""; }, 2500);
+
+        } else {
+            msgEl.style.color = "red";
+            msgEl.textContent = "❌ " + data.error;
+        }
+
+    } catch (err) {
+        msgEl.style.color = "red";
+        msgEl.textContent = "❌ Could not connect to server. Is Flask running?";
+        console.error(err);
+    }
+}
+
+
+// ============================================================
+// RENDER MEAL TABLE
+// ============================================================
+// Takes an array of meal objects (from /dashboard) and
+// renders them as rows in the meal history table.
+// ============================================================
+function renderMealTable(meals) {
+
+    const tbody = document.getElementById("mealTableBody");
+
+    if (!meals || meals.length === 0) {
+        tbody.innerHTML =
+            '<tr><td colspan="6" class="text-muted">No meals logged yet today.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = meals.map(m => `
+        <tr>
+            <td>${m.meal_type  || "-"}</td>
+            <td>${m.food_name}</td>
+            <td>${m.quantity   || 1}</td>
+            <td>${m.calories   * (m.quantity || 1)}</td>
+            <td>${(m.protein   * (m.quantity || 1)).toFixed(1)}g</td>
+            <td>${(m.carbs     * (m.quantity || 1)).toFixed(1)}g</td>
+        </tr>
+    `).join("");
+}
+
+
+// ============================================================
+// RENDER SUMMARY CARDS & PROGRESS BAR
+// ============================================================
+function renderSummaryCards(calories, protein, carbs, fat) {
+
+    document.getElementById("caloriesTotal").textContent = calories;
+    document.getElementById("proteinTotal").textContent  = protein.toFixed(1) + "g";
+    document.getElementById("carbsTotal").textContent    = carbs.toFixed(1)   + "g";
+    document.getElementById("fatTotal").textContent      = fat.toFixed(1)     + "g";
+
+    // Update progress bar (goal = 1800 kcal)
+    const pct = Math.min((calories / 1800) * 100, 100);
+    document.getElementById("calFill").style.width            = pct + "%";
+    document.getElementById("calFill").setAttribute("aria-valuenow", pct);
+    document.getElementById("progressText").textContent       = `${calories} / 1800 kcal`;
+}
+
+
+// ============================================================
+// WATER INTAKE
+// ============================================================
+// Water is a simple counter stored in localStorage.
+// Not critical enough to store in the database.
+// ============================================================
+function addWater() {
+    waterGlasses++;
+    localStorage.setItem("waterGlasses", waterGlasses);
+    renderWater();
+}
+
+function renderWater() {
+    document.getElementById("waterDisplay").textContent =
+        `${waterGlasses} / 8 Glasses`;
+}
+
+
+// ============================================================
+// LOGOUT
+// ============================================================
+async function logoutUser() {
+    try {
+        await fetch(API_URL + "/logout", {
+            method     : "POST",
+            credentials: "include"
+        });
+    } catch (err) {
+        console.error("Logout error:", err);
+    }
+    localStorage.clear();
+    window.location.href = "index.html";
+}
+
+
+// ============================================================
+// DELETE ACCOUNT
+// ============================================================
+async function deleteMyAccount() {
+
+    const confirmed = confirm(
+        "Are you sure you want to permanently delete your account?\n" +
+        "This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+        const res  = await fetch(API_URL + "/delete-account", {
+            method     : "DELETE",
+            credentials: "include"
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.clear();
+            alert("Your account has been deleted.");
+            window.location.href = "index.html";
+        } else {
+            alert("Error: " + data.error);
+        }
+
+    } catch (err) {
+        alert("Could not connect to server. Is Flask running?");
+        console.error(err);
+    }
+}
+
+</script>
+
+<!-- WHO Health Tips Widget -->
+<script src="who_tips.js"></script>
+<script>
+    // ============================================================
+    // WHO HEALTH TIPS WIDGET
+    // ============================================================
+    // Shows a rotating floating card with WHO nutrition tips.
+    // See who_tips.js for the full implementation.
+    // ============================================================
+    initWhoTips();
+</script>
+
+</body>
+</html>

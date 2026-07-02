@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | NutriSense AI</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+*{
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f7fa;
+    min-height:100vh;
+}
+
+.navbar{
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#2E8B57;
+}
+
+.logout-btn{
+    background:#eee;
+    border:none;
+    border-radius:8px;
+    padding:8px 16px;
+    cursor:pointer;
+}
+
+.welcome-banner{
+    background:linear-gradient(135deg,#4CAF50,#2E8B57);
+    color:white;
+    border-radius:20px;
+    padding:35px;
+}
+
+.welcome-banner h1{
+    margin-bottom:5px;
+}
+
+.admin-badge{
+    background:rgba(255,255,255,.2);
+    border-radius:30px;
+    padding:6px 16px;
+    font-size:14px;
+    display:inline-block;
+}
+
+.section-card{
+    background:white;
+    border-radius:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.section-card h2{
+    color:#2E8B57;
+    font-size:22px;
+}
+
+.right-card{
+    border:2px solid #eee;
+    border-radius:14px;
+    padding:18px;
+    height:100%;
+    transition:.3s;
+}
+
+.right-card:hover{
+    border-color:#2E8B57;
+    transform:translateY(-4px);
+}
+
+.right-card .icon{
+    font-size:28px;
+}
+
+.right-card h5{
+    color:#2E8B57;
+    margin:10px 0 5px;
+}
+
+.right-card p{
+    color:#666;
+    font-size:14px;
+    margin-bottom:0;
+}
+
+table th{
+    color:#2E8B57;
+    border-bottom-width:2px;
+}
+
+.role-badge{
+    border-radius:30px;
+    padding:5px 12px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.role-admin{
+    background:#e6f4ea;
+    color:#2E8B57;
+}
+
+.role-user{
+    background:#eef2ff;
+    color:#3949ab;
+}
+
+.btn-action{
+    border-radius:8px;
+    padding:5px 10px;
+    font-size:13px;
+}
+
+.btn-brand{
+    background:#2E8B57;
+    color:white;
+    border-color:#2E8B57;
+    border-radius:10px;
+}
+
+.btn-brand:hover{
+    background:#246b44;
+    border-color:#246b44;
+    color:white;
+}
+
+.empty-state{
+    text-align:center;
+    color:#888;
+    padding:30px;
+}
+
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-light bg-white">
+    <div class="container d-flex justify-content-between align-items-center">
+        <span class="logo">🥗 NutriSense AI</span>
+        <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+</nav>
+
+<div class="container my-5" style="max-width:1100px;">
+
+<!-- WELCOME BANNER -->
+<div class="welcome-banner mb-4">
+    <span class="admin-badge">🛡️ Administrator Access</span>
+    <h1 class="mt-2">Welcome, Admin</h1>
+    <p class="mb-0">Manage users, monitor activity, and control NutriSense AI from one place.</p>
+</div>
+
+<!-- STATS CARDS -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="section-card p-4 text-center">
+            <h2 id="statTotalUsers">0</h2>
+            <p class="mb-0 text-muted">Total Users</p>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="section-card p-4 text-center">
+            <h2 id="statTotalMeals">0</h2>
+            <p class="mb-0 text-muted">Meals Logged</p>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="section-card p-4 text-center">
+            <div id="statGoals">Loading...</div>
+            <p class="mb-0 text-muted mt-2">Goal Distribution</p>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN RIGHTS / PRIVILEGES -->
+<div class="section-card p-4 p-md-5 mb-4">
+
+<h2 class="mb-4">Admin Rights &amp; Privileges</h2>
+
+<div class="row g-3">
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">👁️</div>
+<h5>Read Access</h5>
+<p>View all user profiles, meal logs, and reports across the platform.</p>
+</div>
+</div>
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">✏️</div>
+<h5>Modify Access</h5>
+<p>Edit user details, update roles, and correct any account information.</p>
+</div>
+</div>
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">🗑️</div>
+<h5>Delete Access</h5>
+<p>Remove user accounts and associated data permanently from the system.</p>
+</div>
+</div>
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">📊</div>
+<h5>Reports Oversight</h5>
+<p>Access weekly reports and analytics for every registered user.</p>
+</div>
+</div>
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">⚙️</div>
+<h5>System Settings</h5>
+<p>Configure platform-wide settings, AI recommendation rules, and more.</p>
+</div>
+</div>
+
+<div class="col-12 col-sm-6 col-md-4">
+<div class="right-card">
+<div class="icon">🔐</div>
+<h5>Role Management</h5>
+<p>Promote a user to Admin or revoke admin privileges as needed.</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<!-- USER MANAGEMENT -->
+<div class="section-card p-4 p-md-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="mb-0">User Management</h2>
+    <button class="btn btn-brand btn-sm" onclick="openAddUser()">+ Add User</button>
+</div>
+
+<div class="table-responsive">
+<table class="table align-middle">
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Joined</th>
+<th class="text-end">Actions</th>
+</tr>
+</thead>
+<tbody id="usersTableBody">
+</tbody>
+</table>
+</div>
+
+<div id="emptyState" class="empty-state d-none">
+No users found.
+</div>
+
+</div>
+
+</div>
+
+<!-- VIEW USER MODAL -->
+<div class="modal fade" id="viewModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">User Details</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body" id="viewModalBody">
+</div>
+</div>
+</div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div class="modal fade" id="editModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Edit User</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+
+<form id="editForm" onsubmit="saveEditUser(); return false;">
+
+<input type="hidden" id="editIndex">
+
+<div class="mb-3">
+<label class="form-label">Full Name</label>
+<input type="text" id="editName" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Email</label>
+<input type="email" id="editEmail" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Role</label>
+<select id="editRole" class="form-select">
+<option value="User">User</option>
+<option value="Admin">Admin</option>
+</select>
+</div>
+
+<button type="submit" class="btn btn-brand w-100">Save Changes</button>
+
+</form>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Delete User</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+<p>Are you sure you want to delete <strong id="deleteUserName"></strong>? This action cannot be undone.</p>
+<input type="hidden" id="deleteIndex">
+<button class="btn btn-danger w-100" onclick="confirmDeleteUser()">Yes, Delete User</button>
+</div>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+const API_URL = "http://127.0.0.1:5000";
+let viewModal, editModal, deleteModal;
+let allUsers = [];
+
+window.onload = async function(){
+    viewModal   = new bootstrap.Modal(document.getElementById('viewModal'));
+    editModal   = new bootstrap.Modal(document.getElementById('editModal'));
+    deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+    // Admin session check
+    const ok = await checkAdminSession();
+    if(!ok) return;
+
+    await loadStats();
+    await loadUsers();
+};
+
+// ---- Session Check ----
+async function checkAdminSession(){
+    try {
+        const res = await fetch(API_URL + "/admin/users", { credentials: "include" });
+        if(res.status === 403){
+            alert("Admin login zaroori hai!");
+            window.location.href = "index.html";
+            return false;
+        }
+        return true;
+    } catch(err){
+        alert("Server se connect nahi ho saka. Flask chal raha hai?");
+        return false;
+    }
+}
+
+// ---- Load Stats ----
+async function loadStats(){
+    try {
+        const res  = await fetch(API_URL + "/admin/stats", { credentials: "include" });
+        const data = await res.json();
+
+        if(res.ok){
+            document.getElementById("statTotalUsers").innerText  = data.total_users  || 0;
+            document.getElementById("statTotalMeals").innerText  = data.total_meals  || 0;
+
+            // Goal breakdown
+            let goalHtml = data.goal_stats.map(g =>
+                `<span class="badge bg-success me-1">${g.goal}: ${g.count}</span>`
+            ).join("");
+            document.getElementById("statGoals").innerHTML = goalHtml || "No data";
+        }
+    } catch(err){ console.error(err); }
+}
+
+// ---- Load All Users ----
+async function loadUsers(){
+    try {
+        const res  = await fetch(API_URL + "/admin/users", { credentials: "include" });
+        const data = await res.json();
+
+        if(res.ok){
+            allUsers = data.users;
+            renderUsers(allUsers);
+        } else {
+            alert(data.error);
+        }
+    } catch(err){ console.error(err); }
+}
+
+// ---- Render Users Table ----
+function renderUsers(users){
+    const body       = document.getElementById("usersTableBody");
+    const emptyState = document.getElementById("emptyState");
+    body.innerHTML   = "";
+
+    if(!users || users.length === 0){
+        emptyState.classList.remove("d-none");
+        return;
+    }
+    emptyState.classList.add("d-none");
+
+    users.forEach(function(user){
+        const row = document.createElement("tr");
+        row.innerHTML =
+            `<td>${user.username}</td>` +
+            `<td>${user.email}</td>` +
+            `<td><span class="role-badge role-user">User</span></td>` +
+            `<td>${user.goal || "-"}</td>` +
+            `<td class="text-end">` +
+                `<button class="btn btn-outline-secondary btn-action me-1" onclick='viewUser(${user.id})'>View</button>` +
+                `<button class="btn btn-outline-danger btn-action" onclick='openDeleteUser(${user.id}, "${user.username}")'>Delete</button>` +
+            `</td>`;
+        body.appendChild(row);
+    });
+}
+
+// ---- View User ----
+function viewUser(id){
+    const user = allUsers.find(u => u.id === id);
+    if(!user) return;
+
+    document.getElementById("viewModalBody").innerHTML =
+        `<p><strong>Username:</strong> ${user.username}</p>` +
+        `<p><strong>Email:</strong> ${user.email}</p>` +
+        `<p><strong>Age:</strong> ${user.age || "-"}</p>` +
+        `<p><strong>Goal:</strong> ${user.goal || "-"}</p>` +
+        `<p><strong>Gender:</strong> ${user.gender || "-"}</p>` +
+        `<p><strong>Height:</strong> ${user.height ? user.height + " cm" : "-"}</p>` +
+        `<p><strong>Weight:</strong> ${user.weight ? user.weight + " kg" : "-"}</p>` +
+        `<p><strong>Activity:</strong> ${user.activity_level || "-"}</p>` +
+        `<p><strong>Conditions:</strong> ${user.conditions || "None"}</p>`;
+
+    viewModal.show();
+}
+
+// ---- Delete User ----
+let pendingDeleteId = null;
+
+function openDeleteUser(id, name){
+    pendingDeleteId = id;
+    document.getElementById("deleteUserName").innerText = name;
+    document.getElementById("deleteIndex").value = id;
+    deleteModal.show();
+}
+
+async function confirmDeleteUser(){
+    if(!pendingDeleteId) return;
+
+    try {
+        const res  = await fetch(API_URL + "/admin/delete-user/" + pendingDeleteId, {
+            method: "DELETE",
+            credentials: "include"
+        });
+        const data = await res.json();
+
+        if(res.ok){
+            deleteModal.hide();
+            pendingDeleteId = null;
+            await loadUsers();
+            await loadStats();
+        } else {
+            alert(data.error);
+        }
+    } catch(err){ console.error(err); }
+}
+
+// ---- Admin Logout ----
+async function adminLogout(){
+    await fetch(API_URL + "/admin/logout", { method: "POST", credentials: "include" });
+    window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
